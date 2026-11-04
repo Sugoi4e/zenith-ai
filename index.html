@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090b12">
+  <title>Zenith AI</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #090b12;
+      color: #f5f6fa;
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+    }
+    header {
+      padding: 22px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #202331;
+    }
+    .logo {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: linear-gradient(135deg,#8b7cff,#39c8e9);
+      font-weight: bold;
+      color: #090b12;
+      font-size: 22px;
+    }
+    header h2 { margin: 0; letter-spacing: 1px; }
+    main {
+      max-width: 780px;
+      margin: 100px auto;
+      padding: 20px;
+      text-align: center;
+    }
+    .tag {
+      color: #a99cff;
+      font-size: 12px;
+      letter-spacing: 3px;
+    }
+    h1 { font-size: clamp(36px,8vw,58px); margin: 18px 0; }
+    .subtitle { color: #9298a9; line-height: 1.7; }
+    .chat {
+      margin-top: 45px;
+      display: flex;
+      background: #151925;
+      border: 1px solid #30364a;
+      border-radius: 18px;
+      padding: 10px;
+      gap: 10px;
+    }
+    input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: white;
+      padding: 14px;
+      font-size: 15px;
+    }
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 0 20px;
+      background: #a99cff;
+      color: #090b12;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    footer { color: #656d80; font-size: 12px; margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Z</div>
+    <h2>ZENITH AI</h2>
+  </header>
+
+  <main>
+    <div class="tag">A NEW INTELLIGENCE</div>
+    <h1>Think beyond.<br>Go Zenith.</h1>
+    <p class="subtitle">
+      Your ideas, questions and creativity.<br>
+      One intelligent space for everything.
+    </p>
+
+    <div class="chat">
+      <input id="prompt" placeholder="Ask Zenith anything..." />
+      <button onclick="sendMessage()">Send ↗</button>
+    </div>
+
+    <footer>ZENITH AI · YOUR INTELLIGENCE SPACE</footer>
+  </main>
+
+  <script>
+    function sendMessage() {
+      const input = document.getElementById("prompt");
+      if (!input.value.trim()) return;
+      alert("Zenith AI is being built. AI connection coming soon!");
+    }
+  </script>
+</body>
+</html>
