@@ -78,52 +78,52 @@ textarea{width:100%;resize:none;min-height:48px;max-height:130px;background:tran
 
 <section class="main">
 
-  <header class="topbar">
-    <button class="menu" onclick="toggleMenu()">☰</button>
+<header class="topbar">
+  <button class="menu" onclick="toggleMenu()">☰</button>
 
-    <select class="model" id="model">
-      <option>Zenith Auto</option>
-      <option>Zenith Core</option>
-      <option>Zenith Creative</option>
-    </select>
+  <select class="model" id="model">
+    <option>Zenith Auto</option>
+    <option>Zenith Core</option>
+    <option>Zenith Creative</option>
+  </select>
 
-    <div class="status">● Zenith workspace</div>
-  </header>
+  <div class="status">● Zenith workspace</div>
+</header>
 
-  <div class="content" id="content">
+<div class="content" id="content">
 
-    <div class="welcome" id="welcome">
-      <div class="tag">A NEW INTELLIGENCE</div>
-      <h1>Think beyond.<br><span class="gradient">Go Zenith.</span></h1>
-      <p class="sub">What would you like to explore today?</p>
+  <div class="welcome" id="welcome">
+    <div class="tag">A NEW INTELLIGENCE</div>
+    <h1>Think beyond.<br><span class="gradient">Go Zenith.</span></h1>
+    <p class="sub">What would you like to explore today?</p>
+  </div>
+
+  <div class="messages" id="messages"></div>
+
+</div>
+
+<div class="composer-area">
+  <div class="composer">
+
+    <textarea id="prompt" placeholder="Ask Zenith anything..." rows="2"></textarea>
+
+    <div class="tools">
+      <label class="tool" for="file">＋ Attach</label>
+      <input id="file" type="file" accept="image/*,.pdf,.txt,.doc,.docx">
+
+      <button class="tool" onclick="alert('Image generation will be connected later.')">
+        ✧ Create
+      </button>
+
+      <button class="send" id="sendButton" onclick="sendMessage()">
+        Send ↗
+      </button>
     </div>
-
-    <div class="messages" id="messages"></div>
 
   </div>
 
-  <div class="composer-area">
-    <div class="composer">
-
-      <textarea id="prompt" placeholder="Ask Zenith anything..." rows="2"></textarea>
-
-      <div class="tools">
-        <label class="tool" for="file">＋ Attach</label>
-        <input id="file" type="file" accept="image/*,.pdf,.txt,.doc,.docx">
-
-        <button class="tool" onclick="alert('Image generation will be connected in a future build.')">
-          ✧ Create
-        </button>
-
-        <button class="send" id="sendButton" onclick="sendMessage()">
-          Send ↗
-        </button>
-      </div>
-
-    </div>
-
-    <div class="hint">Zenith AI can make mistakes. Verify important information.</div>
-  </div>
+  <div class="hint">Zenith AI can make mistakes. Verify important information.</div>
+</div>
 
 </section>
 </div>
@@ -146,22 +146,24 @@ function addMessage(text,type){
   return div;
 }
 
-// Temporary connection diagnostic
+// Temporary connection test
 async function testConnection(){
-  const box=addMessage("Testing connection to Zenith...","ai");
+  const box=addMessage("Testing connection...","ai");
 
   try{
-    const response=await fetch(API_URL+"/health");
+    const response=await fetch(API_URL+"/health",{
+      method:"GET",
+      mode:"no-cors"
+    });
 
-    if(!response.ok){
-      throw new Error("HTTP "+response.status);
-    }
-
-    const data=await response.json();
-    box.textContent="CONNECTED!\n"+JSON.stringify(data);
+    box.textContent=
+      "REQUEST REACHED BROWSER!\n"+
+      "Response type: "+response.type+
+      "\nStatus: "+response.status;
 
   }catch(error){
-    box.textContent="CONNECTION FAILED!\n"+
+    box.textContent=
+      "CONNECTION FAILED!\n"+
       error.name+": "+error.message;
   }
 }
@@ -177,7 +179,7 @@ async function sendMessage(){
   historyBox.textContent="Conversation started";
   sendButton.disabled=true;
 
-  const replyBubble=addMessage("Zenith is thinking...","ai");
+  const reply=addMessage("Zenith is thinking...","ai");
 
   try{
     const response=await fetch(API_URL+"/chat",{
@@ -187,21 +189,18 @@ async function sendMessage(){
     });
 
     if(!response.ok){
-      throw new Error("Server returned status "+response.status);
+      throw new Error("HTTP "+response.status);
     }
 
     const data=await response.json();
-
-    replyBubble.textContent=data.reply ||
-      "The backend responded, but no reply was returned.";
+    reply.textContent=data.reply || "No reply returned.";
 
   }catch(error){
-    replyBubble.textContent=
-      "Couldn't reach Zenith's backend. ("+
-      error.name+": "+error.message+")";
+    reply.textContent=
+      "Chat connection failed: "+error.name+
+      ": "+error.message;
   }finally{
     sendButton.disabled=false;
-    promptBox.focus();
   }
 }
 
@@ -227,11 +226,10 @@ promptBox.addEventListener("keydown",e=>{
 document.getElementById("file").addEventListener("change",e=>{
   if(e.target.files.length){
     alert("Selected: "+e.target.files[0].name+
-    ". File processing will be added in a future build.");
+      ". File processing will be added later.");
   }
 });
 
-// Run connection test when the page loads
 testConnection();
 </script>
 
