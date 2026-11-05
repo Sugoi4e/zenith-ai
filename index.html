@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,9 +38,11 @@ textarea{width:100%;resize:none;min-height:48px;max-height:130px;background:tran
 .tools{display:flex;align-items:center;gap:9px}
 .tool{background:#252b3c;border:0;color:#cbd0df;padding:10px 13px;border-radius:10px;cursor:pointer}
 .send{margin-left:auto;background:linear-gradient(135deg,#a38cff,#4bd3eb);color:#080b13;border:0;padding:11px 19px;border-radius:11px;font-weight:bold;cursor:pointer}
+.send:disabled{opacity:.6;cursor:wait}
 .hint{text-align:center;color:#626a7c;font-size:11px;margin-top:12px}
 #file{display:none}
 .menu{display:none;background:none;border:0;color:white;font-size:23px}
+
 @media(max-width:650px){
 .sidebar{position:fixed;z-index:5;left:-280px;top:0;bottom:0;transition:.2s}
 .sidebar.open{left:0}
@@ -75,45 +76,66 @@ textarea{width:100%;resize:none;min-height:48px;max-height:130px;background:tran
 </aside>
 
 <section class="main">
+
   <header class="topbar">
     <button class="menu" onclick="toggleMenu()">☰</button>
+
     <select class="model" id="model">
       <option>Zenith Auto</option>
       <option>Zenith Core</option>
       <option>Zenith Creative</option>
     </select>
+
     <div class="status">● Zenith workspace</div>
   </header>
 
   <div class="content" id="content">
+
     <div class="welcome" id="welcome">
       <div class="tag">A NEW INTELLIGENCE</div>
       <h1>Think beyond.<br><span class="gradient">Go Zenith.</span></h1>
       <p class="sub">What would you like to explore today?</p>
     </div>
+
     <div class="messages" id="messages"></div>
+
   </div>
 
   <div class="composer-area">
     <div class="composer">
+
       <textarea id="prompt" placeholder="Ask Zenith anything..." rows="2"></textarea>
+
       <div class="tools">
         <label class="tool" for="file">＋ Attach</label>
+
         <input id="file" type="file" accept="image/*,.pdf,.txt,.doc,.docx">
-        <button class="tool" onclick="alert('Image generation will be connected in a future build.')">✧ Create</button>
-        <button class="send" onclick="sendMessage()">Send ↗</button>
+
+        <button class="tool" onclick="alert('Image generation will be connected in a future build.')">
+          ✧ Create
+        </button>
+
+        <button class="send" id="sendButton" onclick="sendMessage()">
+          Send ↗
+        </button>
       </div>
+
     </div>
+
     <div class="hint">Zenith AI can make mistakes. Verify important information.</div>
   </div>
+
 </section>
 </div>
 
 <script>
+const API_URL="https://zenith-ai-backend-1q7e.onrender.com";
+
 const promptBox=document.getElementById("prompt");
 const messages=document.getElementById("messages");
 const welcome=document.getElementById("welcome");
 const historyBox=document.getElementById("history");
+const sendButton=document.getElementById("sendButton");
 
 function addMessage(text,type){
   const div=document.createElement("div");
@@ -121,44 +143,105 @@ function addMessage(text,type){
   div.textContent=text;
   messages.appendChild(div);
   document.getElementById("content").scrollTop=999999;
+  return div;
 }
 
-function sendMessage(){
+async function sendMessage(){
+
   const value=promptBox.value.trim();
-  if(!value)return;
+
+  if(!value || sendButton.disabled)return;
 
   welcome.style.display="none";
+
   addMessage(value,"user");
+
   promptBox.value="";
+
   historyBox.textContent="Conversation started";
 
-  addMessage("Zenith AI's intelligence engine is not connected yet. This interface is ready for the backend integration.","ai");
+  sendButton.disabled=true;
+
+  const replyBubble=addMessage("Zenith is thinking...","ai");
+
+  try{
+
+    const response=await fetch(API_URL+"/chat",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        message:value
+      })
+    });
+
+    if(!response.ok){
+      throw new Error("Server returned status "+response.status);
+    }
+
+    const data=await response.json();
+
+    replyBubble.textContent=data.reply ||
+      "The backend responded, but no reply was returned.";
+
+  }catch(error){
+
+    replyBubble.textContent=
+      "Couldn't reach Zenith's backend. Please try again in a moment. ("+
+      error.message+")";
+
+  }finally{
+
+    sendButton.disabled=false;
+    promptBox.focus();
+
+  }
 }
 
 function newChat(){
+
   messages.innerHTML="";
+
   welcome.style.display="block";
+
   historyBox.textContent="Your conversations will appear here.";
+
   promptBox.value="";
+
   document.getElementById("sidebar").classList.remove("open");
+
 }
 
 function toggleMenu(){
+
   document.getElementById("sidebar").classList.toggle("open");
+
 }
 
 promptBox.addEventListener("keydown",e=>{
+
   if(e.key==="Enter"&&!e.shiftKey){
+
     e.preventDefault();
+
     sendMessage();
+
   }
+
 });
 
 document.getElementById("file").addEventListener("change",e=>{
+
   if(e.target.files.length){
-    alert("Selected: "+e.target.files[0].name+". File processing will be added with the backend.");
+
+    alert("Selected: "+e.target.files[0].name+
+    ". File processing will be added in a future build.");
+
   }
+
 });
 </script>
+
 </body>
 </html>
