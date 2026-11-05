@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -146,24 +145,22 @@ function addMessage(text,type){
   return div;
 }
 
-// Temporary connection test
+// Test the real cross-origin connection
 async function testConnection(){
-  const box=addMessage("Testing connection...","ai");
+  const box=addMessage("Checking Zenith server connection...","ai");
 
   try{
-    const response=await fetch(API_URL+"/health",{
-      method:"GET",
-      mode:"no-cors"
-    });
+    const response=await fetch(API_URL+"/health");
 
-    box.textContent=
-      "REQUEST REACHED BROWSER!\n"+
-      "Response type: "+response.type+
-      "\nStatus: "+response.status;
+    if(!response.ok){
+      throw new Error("HTTP "+response.status);
+    }
+
+    const data=await response.json();
+    box.textContent="CONNECTED!\n"+JSON.stringify(data);
 
   }catch(error){
-    box.textContent=
-      "CONNECTION FAILED!\n"+
+    box.textContent="CONNECTION FAILED!\n"+
       error.name+": "+error.message;
   }
 }
@@ -196,11 +193,11 @@ async function sendMessage(){
     reply.textContent=data.reply || "No reply returned.";
 
   }catch(error){
-    reply.textContent=
-      "Chat connection failed: "+error.name+
-      ": "+error.message;
+    reply.textContent="Chat connection failed: "+
+      error.name+": "+error.message;
   }finally{
     sendButton.disabled=false;
+    promptBox.focus();
   }
 }
 
