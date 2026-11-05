@@ -1,21 +1,15 @@
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-app = FastAPI(
-    title="Zenith AI",
-    version="1.0.0"
-)
+app = FastAPI(title="Zenith AI", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://sugoie4.github.io"
-    ],
+    allow_origins=["*"],
     allow_credentials=False,
-    allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type"]
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 class ChatRequest(BaseModel):
@@ -43,4 +37,3 @@ def chat(request: ChatRequest):
         "reply": "Zenith AI backend received your message. AI engine integration is our next task.",
         "conversation_id": request.conversation_id
     }
-  
